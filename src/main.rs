@@ -2,10 +2,10 @@ mod ntp;
 
 use anyhow::{bail, Result};
 use bytes::BytesMut;
-use chrono::DateTime;
 use clap::Parser;
 use ntp::{Leap, Mode, Packet};
 use std::net::SocketAddr;
+use time::{format_description::well_known::Iso8601, OffsetDateTime};
 use tokio::io;
 use tokio::net::{lookup_host, UdpSocket};
 use tokio::time::{timeout, Duration};
@@ -152,15 +152,21 @@ async fn access(args: &Args, addr: SocketAddr) -> Result<()> {
     println!("    reference id: {ref_id}");
     println!(
         "    reference timestamp: {}",
-        DateTime::from(packet.reference_time),
+        OffsetDateTime::from(packet.reference_time)
+            .format(&Iso8601::DEFAULT)
+            .unwrap(),
     );
     println!(
         "      receive timestamp: {}",
-        DateTime::from(packet.receive_time),
+        OffsetDateTime::from(packet.receive_time)
+            .format(&Iso8601::DEFAULT)
+            .unwrap(),
     );
     println!(
         "     transmit timestamp: {}",
-        DateTime::from(packet.transmit_time),
+        OffsetDateTime::from(packet.transmit_time)
+            .format(&Iso8601::DEFAULT)
+            .unwrap(),
     );
 
     Ok(())

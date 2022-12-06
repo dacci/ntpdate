@@ -1,7 +1,8 @@
 use anyhow::{anyhow, Error};
 use bytes::{Buf, BufMut};
-use chrono::{DateTime, TimeZone, Utc};
 use std::fmt;
+use std::time::Duration;
+use time::{macros::datetime, OffsetDateTime};
 
 #[derive(Debug, Default, Clone)]
 pub struct ShortTime(u16, u16);
@@ -26,13 +27,10 @@ impl ShortTime {
 #[derive(Debug, Default, Clone)]
 pub struct Timestamp(u32, u32);
 
-impl From<Timestamp> for DateTime<Utc> {
+impl From<Timestamp> for OffsetDateTime {
     fn from(Timestamp(secs, frac): Timestamp) -> Self {
-        Utc.timestamp_opt(
-            (secs - 2208988800) as _,
-            (frac as f64 / 4294967296.0 * 1000000000.0) as _,
-        )
-        .unwrap()
+        datetime!(1900-01-01 00:00:00 UTC)
+            + Duration::new(secs as _, (frac as f64 / 4.294967296) as _)
     }
 }
 
